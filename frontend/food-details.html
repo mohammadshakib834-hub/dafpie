@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation Details - DAFPIE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top border-bottom bg-white">
+        <div class="container">
+            <a class="navbar-brand" href="index.html"><i class="bi bi-box2-heart text-primary-theme"></i> DAFPIE</a>
+            <div class="d-flex align-items-center" id="userNav">
+                <button onclick="history.back()" class="btn btn-outline-secondary me-2"><i class="bi bi-arrow-left"></i> Back</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5 mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card custom-card border-0 p-0 overflow-hidden">
+                    <div class="row g-0">
+                        <!-- Map Fallback / Visual section -->
+                        <div class="col-md-5 bg-dark position-relative">
+                            <div id="map" style="height: 100%; min-height: 300px;"></div>
+                            <div class="position-absolute top-0 start-0 m-3 z-3 bg-white p-2 rounded shadow-sm">
+                                <small class="fw-bold"><i class="bi bi-geo-alt-fill text-danger"></i> Pickup Location</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Details section -->
+                        <div class="col-md-7">
+                            <div class="card-body p-4 p-md-5">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h2 class="fw-bold mb-1" id="detFoodName">Loading...</h2>
+                                        <p class="text-muted m-0"><i class="bi bi-tag-fill"></i> <span id="detCategory">...</span> • <span id="detType">...</span></p>
+                                    </div>
+                                    <div id="detStatusBadge"></div>
+                                </div>
+                                
+                                <div id="detUrgency" class="mb-4"></div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <div class="p-3 bg-light rounded text-center">
+                                            <h3 class="fw-bold text-primary-theme m-0" id="detQuantity">0</h3>
+                                            <span class="text-muted small">Quantity</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 bg-light rounded text-center">
+                                            <h5 class="fw-bold text-danger m-0" id="detExpiry">--</h5>
+                                            <span class="text-muted small">Expires At</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h5 class="fw-bold border-bottom pb-2 mb-3">Donor Details</h5>
+                                <p class="mb-1"><i class="bi bi-person-fill text-muted me-2"></i> <strong id="detDonorName">...</strong></p>
+                                <p class="mb-1"><i class="bi bi-geo-alt-fill text-muted me-2"></i> <span id="detAddress">...</span></p>
+                                <p class="mb-4"><i class="bi bi-telephone-fill text-muted me-2"></i> <span id="detContact">...</span></p>
+                                
+                                <h5 class="fw-bold border-bottom pb-2 mb-3">Description</h5>
+                                <p class="text-muted mb-4" id="detDescription">...</p>
+                                
+                                <div id="smartMatchSection" class="alert alert-info d-none mb-4">
+                                    <strong><i class="bi bi-stars"></i> Smart Match Recommendation:</strong>
+                                    <ul class="mb-0 mt-2 ps-3" id="smartMatchList"></ul>
+                                </div>
+
+                                <div id="actionContainer" class="d-grid mt-4">
+                                    <!-- Action buttons populated dynamically based on role and status -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentDonation = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const donationId = urlParams.get('id');
+            
+            if (!donationId) {
+                showAlert('Donation ID missing', 'danger');
+                return;
+            }
+
+            try {
+                currentDonation = await apiCall(`/donations/${donationId}`);
+                renderDetails(currentDonation);
+                initMapFallback(currentDonation.city); // Initialize simple map
+                
+                const user = AuthState.getUser();
+                if (user && user.role === 'NGO' && currentDonation.status === 'AVAILABLE') {
+                    checkSmartMatches(donationId);
+                }
+            } catch (e) {
+                showAlert(e.message, 'danger');
+            }
+        });
+
+        function renderDetails(d) {
+            document.getElementById('detFoodName').textContent = d.foodName;
+            document.getElementById('detCategory').textContent = d.category.replace('_', ' ');
+            document.getElementById('detType').textContent = d.foodType;
+            document.getElementById('detQuantity').textContent = `${d.quantity} ${d.unit}`;
+            document.getElementById('detExpiry').textContent = new Date(d.expiryTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            document.getElementById('detDonorName').textContent = d.donor.name;
+            document.getElementById('detAddress').textContent = `${d.pickupAddress}, ${d.city}`;
+            document.getElementById('detContact').textContent = d.contactNumber;
+            document.getElementById('detDescription').textContent = d.description || 'No additional description provided.';
+            
+            // Status and Urgency Badges
+            document.getElementById('detStatusBadge').innerHTML = getStatusBadge(d.status);
+            if (d.urgencyLevel && d.status === 'AVAILABLE') {
+                document.getElementById('detUrgency').innerHTML = getUrgencyBadge(d.urgencyLevel);
+            }
+
+            renderActionButtons(d);
+        }
+        
+        function renderActionButtons(d) {
+            const user = AuthState.getUser();
+            const container = document.getElementById('actionContainer');
+            
+            if (!user) {
+                container.innerHTML = `<a href="login.html" class="btn btn-primary-custom btn-lg">Login as NGO to Accept</a>`;
+                return;
+            }
+
+            if (user.role === 'NGO' && d.status === 'AVAILABLE') {
+                container.innerHTML = `<button onclick="acceptDonation(${d.id})" class="btn btn-primary-custom btn-lg w-100">Accept Donation</button>`;
+            } else if (user.role === 'NGO' && d.status === 'ACCEPTED' && d.acceptedByNgo.id === user.id) {
+                container.innerHTML = `<button onclick="window.location.href='ngo-dashboard.html'" class="btn btn-secondary-custom btn-lg w-100">Go to Dashboard to Request Volunteer</button>`;
+            }
+            else {
+                // If donor looking at their own, or someone else, just show status
+                container.innerHTML = `<button class="btn btn-light btn-lg border" disabled>Status: ${d.status.replace('_', ' ')}</button>`;
+            }
+        }
+
+        async function acceptDonation(id) {
+            if(!confirm('Are you sure you want to accept this donation? You will be responsible for picking it up or requesting a volunteer.')) return;
+            try {
+                await apiCall(`/ngos/donations/${id}/accept`, { method: 'POST' });
+                showAlert('Donation accepted successfully!', 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } catch (e) {
+                showAlert(e.message, 'danger');
+            }
+        }
+
+        async function checkSmartMatches(donationId) {
+            try {
+                const matches = await apiCall(`/matching/donations/${donationId}/ngos`);
+                const user = AuthState.getUser();
+                
+                // If the current NGO is highly matched, show them a message
+                const myMatch = matches.find(m => m.ngo.id === user.id);
+                if (myMatch && myMatch.matchScore > 0) {
+                    const section = document.getElementById('smartMatchSection');
+                    const list = document.getElementById('smartMatchList');
+                    section.classList.remove('d-none');
+                    list.innerHTML = `<li>This donation is a great match for your NGO! Reason: ${myMatch.reason}</li>`;
+                }
+            } catch (e) {
+                console.error("Smart match error", e);
+            }
+        }
+
+        function getStatusBadge(status) {
+            const map = {
+                'AVAILABLE': '<span class="badge bg-primary">Available</span>',
+                'ACCEPTED': '<span class="badge bg-info">Accepted</span>',
+                'COMPLETED': '<span class="badge bg-success">Completed</span>',
+            };
+            return map[status] || `<span class="badge bg-secondary">${status}</span>`;
+        }
+        function getUrgencyBadge(level) {
+            const map = {
+                'HIGH': '<div class="alert alert-danger py-2 mb-0"><i class="bi bi-exclamation-triangle-fill"></i> HIGH Urgency - Expires very soon!</div>',
+                'MEDIUM': '<div class="alert alert-warning py-2 mb-0"><i class="bi bi-clock"></i> Medium Urgency</div>',
+            };
+            return map[level] || '';
+        }
+
+        // Simple map initialization focusing on the city name (since we might not have lat/lon without geocoding API)
+        function initMapFallback(cityName) {
+            // Using Leaflet and OpenStreetMap for an out-of-the-box free map display
+            // We use a dummy coordinate centered on India or specific city if known, 
+            // but for a student project, a generic map tile works perfectly as visual fallback.
+            
+            // Hardcode some coords for demo cities
+            const coords = {
+                'coimbatore': [11.0168, 76.9558],
+                'chennai': [13.0827, 80.2707],
+                'bangalore': [12.9716, 77.5946]
+            };
+            
+            let center = coords[cityName.toLowerCase()] || [20.5937, 78.9629]; // Default India
+            let zoom = coords[cityName.toLowerCase()] ? 13 : 5;
+
+            const map = L.map('map').setView(center, zoom);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            if (coords[cityName.toLowerCase()]) {
+                L.marker(center).addTo(map)
+                    .bindPopup(`Pickup Area: ${cityName}`)
+                    .openPopup();
+            }
+        }
+    </script>
+</body>
+</html>

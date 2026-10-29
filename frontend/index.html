@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAFPIE - Sustainable Food Waste Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-box2-heart text-primary-theme"></i> DAFPIE
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
+                    <li class="nav-item"><a class="nav-link" href="food-list.html">Find Food</a></li>
+                </ul>
+                <div class="d-flex" id="guestNav">
+                    <a href="login.html" class="nav-link pt-2">Login</a>
+                    <a href="register.html" class="btn btn-primary-custom ms-2">Register</a>
+                </div>
+                <div class="d-flex align-items-center" id="userNav" style="display: none !important;">
+                    <span class="me-3 fw-bold" id="userNameDisplay">User</span>
+                    <a href="#" id="dashboardLink" class="btn btn-outline-custom me-2">Dashboard</a>
+                    <button onclick="logout()" class="btn btn-secondary-custom">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <h1 class="hero-title">Don't Waste Food.<br><span class="text-primary-theme">Share It.</span></h1>
+                    <p class="hero-subtitle">"DAFPIE connects surplus food with NGOs and volunteers to help people in need. Every meal matters."</p>
+                    <div class="d-flex gap-3">
+                        <a href="donate.html" class="btn btn-primary-custom btn-lg"><i class="bi bi-heart me-2"></i> Donate Food</a>
+                        <a href="register.html?role=VOLUNTEER" class="btn btn-outline-custom btn-lg"><i class="bi bi-bicycle me-2"></i> Become a Volunteer</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-visual text-center">
+                        <h4 class="mb-4">The DAFPIE Flow</h4>
+                        <div class="d-flex flex-column align-items-center">
+                            <div class="bg-light rounded p-3 mb-2 w-75"><strong><i class="bi bi-shop"></i> Restaurant / Donor</strong></div>
+                            <i class="bi bi-arrow-down fs-4 text-primary-theme"></i>
+                            <div class="bg-light rounded p-3 mb-2 w-75"><strong><i class="bi bi-box-seam"></i> Surplus Food</strong></div>
+                            <i class="bi bi-arrow-down fs-4 text-primary-theme"></i>
+                            <div class="bg-primary-theme rounded p-3 mb-2 w-75"><strong><i class="bi bi-globe"></i> DAFPIE Platform</strong></div>
+                            <i class="bi bi-arrow-down fs-4 text-primary-theme"></i>
+                            <div class="bg-light rounded p-3 mb-2 w-75"><strong><i class="bi bi-building"></i> NGO + Volunteer</strong></div>
+                            <i class="bi bi-arrow-down fs-4 text-primary-theme"></i>
+                            <div class="bg-secondary-theme rounded p-3 mb-2 w-75"><strong><i class="bi bi-people"></i> People in Need</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="row text-center mb-5">
+                <div class="col-lg-8 mx-auto">
+                    <h2 class="mb-3">Why DAFPIE?</h2>
+                    <p class="text-muted lead">Food waste and hunger are two major social problems. We solve both with one simple platform.</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    <div class="p-4 bg-light rounded-4 h-100">
+                        <i class="bi bi-trash-fill text-danger fs-1 mb-3"></i>
+                        <h4>Reduce Waste</h4>
+                        <p class="text-muted">Thousands of tons of perfectly good food go to waste daily. We help divert it to those who need it most.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="p-4 bg-light rounded-4 h-100">
+                        <i class="bi bi-phone-fill text-primary-theme fs-1 mb-3"></i>
+                        <h4>Simple Platform</h4>
+                        <p class="text-muted">A digital bridge connecting food donors, NGOs, and volunteer delivery partners in real-time.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="p-4 bg-light rounded-4 h-100">
+                        <i class="bi bi-emoji-smile-fill text-secondary-theme fs-1 mb-3"></i>
+                        <h4>Feed the Hungry</h4>
+                        <p class="text-muted">Empowering NGOs to focus on distribution while we handle the sourcing and logistics.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-5 bg-light">
+        <div class="container py-4">
+            <h2 class="text-center mb-5">How It Works</h2>
+            <div class="row g-4 text-center">
+                <div class="col-md-3">
+                    <div class="flow-step">
+                        <i class="bi bi-plus-circle-fill flow-icon"></i>
+                        <h5>Step 1: Donate</h5>
+                        <p class="text-muted small">Donor adds details about surplus food.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="flow-step">
+                        <i class="bi bi-search flow-icon"></i>
+                        <h5>Step 2: Match</h5>
+                        <p class="text-muted small">NGO finds suitable available food nearby.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="flow-step">
+                        <i class="bi bi-truck flow-icon"></i>
+                        <h5>Step 3: Pickup</h5>
+                        <p class="text-muted small">Volunteer collects the food from the donor.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="flow-step">
+                        <i class="bi bi-check-circle-fill flow-icon"></i>
+                        <h5>Step 4: Deliver</h5>
+                        <p class="text-muted small">Food reaches the NGO or people in need.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer text-center text-md-start">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-white mb-3"><i class="bi bi-box2-heart text-primary-theme"></i> DAFPIE</h5>
+                    <p class="small text-muted mb-0">Donate And Feed People In Need</p>
+                    <p class="small fst-italic text-secondary-theme mt-2">"Every Meal Matters."</p>
+                    <div class="food-safety-banner mt-3 text-dark text-start">
+                        <strong>Important:</strong> Donors are responsible for ensuring that donated food is safe and suitable for consumption.
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-white mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="index.html">Home</a></li>
+                        <li class="mb-2"><a href="#about">About</a></li>
+                        <li class="mb-2"><a href="donate.html">Donate Food</a></li>
+                        <li class="mb-2"><a href="food-list.html">Find Food</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-white mb-3">Connect With Us</h5>
+                    <div class="mb-3">
+                        <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+                    </div>
+                    <p class="small text-muted">Contact: support@dafpie.org</p>
+                </div>
+            </div>
+            <hr class="border-secondary mt-4 mb-4">
+            <div class="text-center small text-muted">
+                &copy; 2026 DAFPIE. All Rights Reserved. (College Project Demo)
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

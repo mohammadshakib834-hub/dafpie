@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - DAFPIE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold text-white" href="index.html"><i class="bi bi-box2-heart text-primary-theme"></i> DAFPIE <span class="badge bg-danger ms-2 fs-6">ADMIN</span></a>
+            <div class="d-flex align-items-center">
+                <span class="me-3 fw-bold text-white" id="userNameDisplay">Admin</span>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="sidebar bg-dark text-white p-0">
+            <div class="p-3 border-bottom border-secondary">
+                <small class="text-muted text-uppercase fw-bold">Management</small>
+            </div>
+            <a href="admin-dashboard.html" class="sidebar-link active text-white"><i class="bi bi-speedometer2 text-white"></i> Dashboard</a>
+            <a href="#" class="sidebar-link text-white"><i class="bi bi-people"></i> Manage Users</a>
+            <a href="#" class="sidebar-link text-white"><i class="bi bi-building"></i> Manage NGOs</a>
+            <a href="#" class="sidebar-link text-white"><i class="bi bi-bicycle"></i> Manage Volunteers</a>
+            <a href="#" class="sidebar-link text-white"><i class="bi bi-card-checklist"></i> All Donations</a>
+        </div>
+
+        <div class="main-content">
+            <h3 class="mb-4">System Overview</h3>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card bg-white border-start border-4 border-primary shadow-sm">
+                        <div class="stat-details">
+                            <p class="text-uppercase text-muted small fw-bold mb-1">Total Food Saved</p>
+                            <h3 id="statFoodSaved" class="text-primary-theme">0 kg</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-white border-start border-4 border-success shadow-sm">
+                        <div class="stat-details">
+                            <p class="text-uppercase text-muted small fw-bold mb-1">People Helped</p>
+                            <h3 id="statPeopleHelped" class="text-success">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-white border-start border-4 border-warning shadow-sm">
+                        <div class="stat-details">
+                            <p class="text-uppercase text-muted small fw-bold mb-1">Total Donations</p>
+                            <h3 id="statTotalDonations" class="text-warning">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-white border-start border-4 border-info shadow-sm">
+                        <div class="stat-details">
+                            <p class="text-uppercase text-muted small fw-bold mb-1">Completed Deliveries</p>
+                            <h3 id="statCompleted" class="text-info">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4">Users Distribution</h5>
+                            <div class="row text-center mb-4">
+                                <div class="col-4 border-end">
+                                    <h2 id="statDonors" class="fw-bold m-0">0</h2>
+                                    <span class="text-muted small">Donors</span>
+                                </div>
+                                <div class="col-4 border-end">
+                                    <h2 id="statNgos" class="fw-bold m-0">0</h2>
+                                    <span class="text-muted small">NGOs</span>
+                                </div>
+                                <div class="col-4">
+                                    <h2 id="statVolunteers" class="fw-bold m-0">0</h2>
+                                    <span class="text-muted small">Volunteers</span>
+                                </div>
+                            </div>
+                            <div style="height: 300px; display: flex; justify-content: center;">
+                                <canvas id="userChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4">System Activity logs</h5>
+                            <div class="d-flex mb-3 align-items-center">
+                                <div class="bg-light rounded p-2 me-3"><i class="bi bi-person-plus text-primary"></i></div>
+                                <div>
+                                    <p class="m-0 fw-bold small">New User Registered</p>
+                                    <small class="text-muted">Hope Foundation (NGO)</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3 align-items-center">
+                                <div class="bg-light rounded p-2 me-3"><i class="bi bi-box2 text-success"></i></div>
+                                <div>
+                                    <p class="m-0 fw-bold small">Donation Completed</p>
+                                    <small class="text-muted">Vegetable Biryani delivered.</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3 align-items-center">
+                                <div class="bg-light rounded p-2 me-3"><i class="bi bi-truck text-warning"></i></div>
+                                <div>
+                                    <p class="m-0 fw-bold small">Pickup Accepted</p>
+                                    <small class="text-muted">Alex Volunteer accepted task.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = AuthState.getUser();
+            if (!user || user.role !== 'ADMIN') {
+                window.location.href = 'login.html';
+                return;
+            }
+            loadAdminDashboard();
+        });
+    </script>
+</body>
+</html>

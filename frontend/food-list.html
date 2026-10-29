@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Food - DAFPIE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-box2-heart text-primary-theme"></i> DAFPIE
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="food-list.html">Find Food</a></li>
+                </ul>
+                <div class="d-flex" id="guestNav">
+                    <a href="login.html" class="nav-link pt-2">Login</a>
+                    <a href="register.html" class="btn btn-primary-custom ms-2">Register</a>
+                </div>
+                <div class="d-flex align-items-center" id="userNav" style="display: none !important;">
+                    <span class="me-3 fw-bold" id="userNameDisplay">User</span>
+                    <a href="#" id="dashboardLink" class="btn btn-outline-custom me-2">Dashboard</a>
+                    <button onclick="logout()" class="btn btn-secondary-custom">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5 mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Available Food Donations</h2>
+            
+            <div class="d-flex gap-2">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search food..." style="width: 250px;">
+                <select class="form-select" id="typeFilter" style="width: auto;">
+                    <option value="">All Types</option>
+                    <option value="VEG">Veg</option>
+                    <option value="NON_VEG">Non-Veg</option>
+                    <option value="VEGAN">Vegan</option>
+                </select>
+                <button class="btn btn-primary-custom" onclick="filterFood()"><i class="bi bi-filter"></i> Filter</button>
+            </div>
+        </div>
+
+        <div class="row g-4" id="foodContainer">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let allDonations = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAvailableFood();
+        });
+
+        async function loadAvailableFood() {
+            try {
+                allDonations = await apiCall('/donations');
+                renderFoodCards(allDonations);
+            } catch (e) {
+                document.getElementById('foodContainer').innerHTML = `<div class="col-12"><div class="alert alert-danger">${e.message}</div></div>`;
+            }
+        }
+
+        function filterFood() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            
+            const filtered = allDonations.filter(d => {
+                const matchesSearch = d.foodName.toLowerCase().includes(searchTerm) || d.city.toLowerCase().includes(searchTerm);
+                const matchesType = typeFilter === '' || d.foodType === typeFilter;
+                return matchesSearch && matchesType;
+            });
+            
+            renderFoodCards(filtered);
+        }
+
+        function renderFoodCards(donations) {
+            const container = document.getElementById('foodContainer');
+            if (donations.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center py-5"><h4 class="text-muted">No available donations found matching criteria.</h4></div>';
+                return;
+            }
+
+            container.innerHTML = donations.map(d => {
+                let typeIcon = d.foodType === 'VEG' ? 'circle-fill text-success' : (d.foodType === 'VEGAN' ? 'leaf-fill text-success' : 'circle-fill text-danger');
+                
+                // Urgency badge calculation inline for UI display
+                let urgencyBadge = '';
+                if(d.urgencyLevel === 'HIGH') urgencyBadge = '<span class="badge badge-urgency-high position-absolute top-0 end-0 m-3 shadow-sm">High Urgency</span>';
+                else if(d.urgencyLevel === 'MEDIUM') urgencyBadge = '<span class="badge badge-urgency-medium position-absolute top-0 end-0 m-3 shadow-sm">Med Urgency</span>';
+
+                return `
+                <div class="col-md-6 col-lg-4">
+                    <div class="custom-card card h-100 position-relative">
+                        ${urgencyBadge}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted" style="font-size: 3rem;">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold m-0">${d.foodName}</h5>
+                                <span title="${d.foodType}"><i class="bi bi-${typeIcon}"></i></span>
+                            </div>
+                            <p class="text-muted small mb-3"><i class="bi bi-tag-fill"></i> ${d.category.replace('_', ' ')}</p>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-muted">Quantity:</span>
+                                    <span class="fw-bold">${d.quantity} ${d.unit}</span>
+                                </div>
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-muted">Location:</span>
+                                    <span class="fw-bold"><i class="bi bi-geo-alt-fill text-danger"></i> ${d.city}</span>
+                                </div>
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-muted">Best Before:</span>
+                                    <span class="fw-bold text-danger">${formatDate(d.expiryTime).split(',')[1]}</span>
+                                </div>
+                            </div>
+                            
+                            <a href="food-details.html?id=${d.id}" class="btn btn-outline-custom w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>
